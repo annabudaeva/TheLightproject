@@ -9,6 +9,7 @@ import UIKit
 class ViewController: UIViewController {
     
     var lights = 0
+    var isLightOn = false
     
     override var prefersStatusBarHidden: Bool {
         return true
@@ -17,12 +18,10 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         switchlight(number: lights)
-        updateView()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         switchlight(number: lights)
-        updateView()
         
     }
     
@@ -43,27 +42,29 @@ class ViewController: UIViewController {
         
     }
    
-// фонарик работает (включается на физическом устройстве), но не выключается. Не понимаю почему.
     
-    func updateView() {
+    func setupRealLight() {
            let device = AVCaptureDevice.default(for: AVMediaType.video)
            
            if let dev = device, dev.hasTorch {
                view.backgroundColor = .black
                do {
                    try dev.lockForConfiguration()
-                   dev.torchMode = (lights != 0) ? .on : .off
+                   dev.torchMode = isLightOn ? .on : .off
                    dev.unlockForConfiguration()
                } catch {
                    print(error)
                }
            } else {
-               
-               switchlight(number: lights)
+               print("Device has no torch")
            }
        }
     
-    
+    @IBAction func buttonPressed(_ sender: Any) {
+        isLightOn.toggle()
+        setupRealLight()
+        
+    }
 }
 
 
